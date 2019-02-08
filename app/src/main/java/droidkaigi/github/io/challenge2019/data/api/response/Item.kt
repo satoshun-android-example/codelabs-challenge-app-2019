@@ -2,6 +2,8 @@ package droidkaigi.github.io.challenge2019.data.api.response
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import java.text.SimpleDateFormat
+import java.util.*
 
 @JsonClass(generateAdapter = true)
 data class Item(
@@ -9,7 +11,7 @@ data class Item(
     @Json(name = "deleted") val deleted: Boolean = false,
     @Json(name = "type") val type: String = "",
     @Json(name = "by") val author: String,
-    @Json(name = "time") val time: Long = 0L,
+    @Json(name = "time") val updatedSeconds: Long = 0L,
     @Json(name = "text") val text: String? = "",
     @Json(name = "dead") val dead: Boolean = false,
     @Json(name = "parent") val parent: Long = NO_ID,
@@ -23,5 +25,14 @@ data class Item(
 ) {
     companion object {
         const val NO_ID = -1L
+
+        // todo use threeten?
+        private val formatter = SimpleDateFormat("yyyy/M/d H:MM", Locale.ENGLISH)
     }
+
+
+    val updatedTime
+        get(): String {
+            return formatter.format(Date(updatedSeconds * 1000))
+        }
 }

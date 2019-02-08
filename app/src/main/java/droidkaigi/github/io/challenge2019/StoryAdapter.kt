@@ -10,8 +10,8 @@ import droidkaigi.github.io.challenge2019.databinding.ItemStoryBinding
 
 class StoryAdapter(
     var stories: MutableList<Item?>,
-    private val onClickItem: ((Item) -> Unit)? = null,
-    private val onClickMenuItem: ((Item, Int) -> Unit)? = null,
+    private val onClickItem: ((Item) -> Unit),
+    private val onClickMenuItem: ((Item, Int) -> Unit),
     var alreadyReadStories: Set<String>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -39,7 +39,7 @@ class StoryAdapter(
             }
             holder.binding.item = item
             holder.binding.root.setOnClickListener {
-                onClickItem?.invoke(item)
+                onClickItem(item)
             }
             holder.binding.menuButton.setOnClickListener {
                 val popupMenu = PopupMenu(holder.binding.menuButton.context, holder.binding.menuButton)
@@ -49,7 +49,7 @@ class StoryAdapter(
                     when (menuItemId) {
                         R.id.copy_url,
                         R.id.refresh -> {
-                            onClickMenuItem?.invoke(item, menuItemId)
+                            onClickMenuItem(item, menuItemId)
                             true
                         }
                         else -> false
