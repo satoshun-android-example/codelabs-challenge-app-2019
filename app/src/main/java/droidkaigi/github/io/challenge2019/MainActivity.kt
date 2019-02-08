@@ -11,12 +11,12 @@ import android.os.Bundle
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
 import com.squareup.moshi.Types
 import droidkaigi.github.io.challenge2019.data.api.HackerNewsApi
+import droidkaigi.github.io.challenge2019.data.api.HackerNewsRepository
 import droidkaigi.github.io.challenge2019.data.api.response.Item
 import droidkaigi.github.io.challenge2019.data.db.ArticlePreferences
 import droidkaigi.github.io.challenge2019.data.db.ArticlePreferences.Companion.saveArticleIds
@@ -37,7 +37,7 @@ class MainActivity : BaseActivity() {
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     private lateinit var storyAdapter: StoryAdapter
-    private lateinit var hackerNewsApi: HackerNewsApi
+    private lateinit var repository: HackerNewsRepository
 
     private var getStoriesTask: AsyncTask<Long, Unit, List<Item?>>? = null
     private val itemJsonAdapter = moshi.adapter(Item::class.java)
@@ -57,7 +57,7 @@ class MainActivity : BaseActivity() {
 
         val retrofit = createRetrofit("https://hacker-news.firebaseio.com/v0/")
 
-        hackerNewsApi = retrofit.create(HackerNewsApi::class.java)
+        repository = HackerNewsRepository(retrofit.create(HackerNewsApi::class.java))
 
         val itemDecoration = DividerItemDecoration(recyclerView.context, DividerItemDecoration.VERTICAL)
         recyclerView.addItemDecoration(itemDecoration)
@@ -77,15 +77,16 @@ class MainActivity : BaseActivity() {
                         clipboard.primaryClip = ClipData.newPlainText("url", item.url)
                     }
                     R.id.refresh -> {
-                        hackerNewsApi.getItem(item.id).enqueue(object : Callback<Item> {
+                        repository.getItem(item.id).enqueue(object : Callback<Item> {
                             override fun onResponse(call: Call<Item>, response: Response<Item>) {
                                 response.body()?.let { newItem ->
                                     val index = storyAdapter.stories.indexOf(item)
-                                    if (index == -1 ) return
+                                    if (index == -1) return
 
                                     storyAdapter.stories[index] = newItem
                                     runOnUiThread {
-                                        storyAdapter.alreadyReadStories = ArticlePreferences.getArticleIds(this@MainActivity)
+                                        storyAdapter.alreadyReadStories =
+                                            ArticlePreferences.getArticleIds(this@MainActivity)
                                         storyAdapter.notifyItemChanged(index)
                                     }
                                 }
@@ -122,7 +123,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun loadTopStories() {
-        hackerNewsApi.getTopStories().enqueue(object : Callback<List<Long>> {
+        repository.getTopStories().enqueue(object : Callback<List<Long>> {
 
             override fun onResponse(call: Call<List<Long>>, response: Response<List<Long>>) {
                 if (!response.isSuccessful) return
@@ -136,7 +137,7 @@ class MainActivity : BaseActivity() {
                             val latch = CountDownLatch(ids.size)
 
                             ids.forEach { id ->
-                                hackerNewsApi.getItem(id).enqueue(object : Callback<Item> {
+                                repository.getItem(id).enqueue(object : Callback<Item> {
                                     override fun onResponse(call: Call<Item>, response: Response<Item>) {
                                         response.body()?.let { item -> itemMap[id] = item }
                                         latch.countDown()
@@ -179,7 +180,7 @@ class MainActivity : BaseActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when(resultCode) {
+        when (resultCode) {
             Activity.RESULT_OK -> {
                 data?.getLongExtra(StoryActivity.READ_ARTICLE_ID, 0L)?.let { id ->
                     if (id != 0L) {
