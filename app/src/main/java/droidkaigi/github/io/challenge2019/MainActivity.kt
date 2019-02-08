@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
@@ -45,9 +44,7 @@ class MainActivity : BaseActivity() {
         moshi.adapter<List<Item?>>(Types.newParameterizedType(List::class.java, Item::class.java))
 
 
-    override fun getContentView(): Int {
-        return R.layout.activity_main
-    }
+    override fun getContentView(): Int = R.layout.activity_main
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,11 +78,12 @@ class MainActivity : BaseActivity() {
                             override fun onResponse(call: Call<Item>, response: Response<Item>) {
                                 response.body()?.let { newItem ->
                                     val index = storyAdapter.stories.indexOf(item)
-                                    if (index == -1 ) return
+                                    if (index == -1) return
 
                                     storyAdapter.stories[index] = newItem
                                     runOnUiThread {
-                                        storyAdapter.alreadyReadStories = ArticlePreferences.getArticleIds(this@MainActivity)
+                                        storyAdapter.alreadyReadStories =
+                                            ArticlePreferences.getArticleIds(this@MainActivity)
                                         storyAdapter.notifyItemChanged(index)
                                     }
                                 }
@@ -179,7 +177,7 @@ class MainActivity : BaseActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when(resultCode) {
+        when (resultCode) {
             Activity.RESULT_OK -> {
                 data?.getLongExtra(StoryActivity.READ_ARTICLE_ID, 0L)?.let { id ->
                     if (id != 0L) {
