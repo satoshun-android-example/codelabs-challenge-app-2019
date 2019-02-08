@@ -38,7 +38,8 @@ class MainActivity : BaseActivity() {
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     private lateinit var storyAdapter: StoryAdapter
-    private lateinit var repository: HackerNewsRepository
+
+    private lateinit var viewModel: MainViewModel
 
     private var getStoriesTask: AsyncTask<Long, Unit, List<Item?>>? = null
     private val itemJsonAdapter = moshi.adapter(Item::class.java)
@@ -58,7 +59,9 @@ class MainActivity : BaseActivity() {
 
         val retrofit = createRetrofit("https://hacker-news.firebaseio.com/v0/")
 
-        repository = HackerNewsRepository(retrofit.create(HackerNewsApi::class.java))
+        viewModel = MainViewModel(
+            HackerNewsRepository(retrofit.create(HackerNewsApi::class.java))
+        )
 
         val itemDecoration = DividerItemDecoration(recyclerView.context, DividerItemDecoration.VERTICAL)
         recyclerView.addItemDecoration(itemDecoration)
@@ -79,7 +82,7 @@ class MainActivity : BaseActivity() {
                         clipboard.primaryClip = ClipData.newPlainText("url", item.url)
                     }
                     R.id.refresh -> {
-                        repository.getStory(item.id).enqueue(object : Callback<Item> {
+                        viewModel.getStory(item.id).enqueue(object : Callback<Item> {
                             override fun onResponse(call: Call<Item>, response: Response<Item>) {
                                 response.body()?.let { newItem ->
                                     val index = storyAdapter.stories.indexOf(item)
@@ -125,7 +128,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun loadTopStories() {
-        repository.getTopStories().enqueue(object : Callback<List<Long>> {
+        viewModel.getTopStories().enqueue(object : Callback<List<Long>> {
 
             override fun onResponse(call: Call<List<Long>>, response: Response<List<Long>>) {
                 if (!response.isSuccessful) return
@@ -139,7 +142,7 @@ class MainActivity : BaseActivity() {
                             val latch = CountDownLatch(ids.size)
 
                             ids.forEach { id ->
-                                repository.getStory(id).enqueue(object : Callback<Item> {
+                                viewModel.getStory(id).enqueue(object : Callback<Item> {
                                     override fun onResponse(call: Call<Item>, response: Response<Item>) {
                                         response.body()?.let { item -> itemMap[id] = item }
                                         latch.countDown()
