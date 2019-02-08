@@ -13,23 +13,26 @@ class StoryAdapter(
     private val onClickItem: ((Item) -> Unit)? = null,
     private val onClickMenuItem: ((Item, Int) -> Unit)? = null,
     var alreadyReadStories: Set<String>
-) : RecyclerView.Adapter<StoryAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    class ViewHolder(val binding: ItemStoryBinding) : RecyclerView.ViewHolder(binding.root)
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemStoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ViewHolder(binding)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val binding = ItemStoryBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
+        return StoryViewHolder(binding)
     }
 
     override fun getItemCount(): Int = stories.size
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = stories[position]
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (holder !is StoryViewHolder) return
 
+        val item = stories[position]
         if (item != null) {
             holder.binding.alreadyRead = false
-            alreadyReadStories.forEach {id ->
+            alreadyReadStories.forEach { id ->
                 if (id.toLong() == item.id) {
                     holder.binding.alreadyRead = true
                 }
@@ -61,3 +64,7 @@ class StoryAdapter(
         }
     }
 }
+
+private class StoryViewHolder(
+    val binding: ItemStoryBinding
+) : RecyclerView.ViewHolder(binding.root)
