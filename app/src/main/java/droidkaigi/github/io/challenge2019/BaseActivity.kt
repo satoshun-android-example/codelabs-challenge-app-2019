@@ -55,9 +55,7 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
-    fun startActivityForResult(intent: Intent?) {
-        intent?.let { intent2 ->
-            startActivityForResult(intent2, ACTIVITY_REQUEST)
-        }
+    fun startActivityForResult(intent: Intent) {
+        startActivityForResult(intent, ACTIVITY_REQUEST)
     }
 }
