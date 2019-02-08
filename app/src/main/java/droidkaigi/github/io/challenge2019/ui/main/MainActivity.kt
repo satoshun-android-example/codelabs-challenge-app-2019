@@ -1,4 +1,4 @@
-package droidkaigi.github.io.challenge2019
+package droidkaigi.github.io.challenge2019.ui.main
 
 import android.app.Activity
 import android.arch.lifecycle.Observer
@@ -14,11 +14,15 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
 import com.squareup.moshi.Types
+import droidkaigi.github.io.challenge2019.BaseActivity
+import droidkaigi.github.io.challenge2019.R
+import droidkaigi.github.io.challenge2019.Util
 import droidkaigi.github.io.challenge2019.data.db.ArticlePreferences
 import droidkaigi.github.io.challenge2019.data.db.ArticlePreferences.Companion.saveArticleIds
 import droidkaigi.github.io.challenge2019.data.repository.HackerNewsRepository
 import droidkaigi.github.io.challenge2019.data.repository.Resource
 import droidkaigi.github.io.challenge2019.data.repository.entity.Story
+import droidkaigi.github.io.challenge2019.ui.story.StoryActivity
 
 class MainActivity : BaseActivity() {
 
@@ -52,9 +56,10 @@ class MainActivity : BaseActivity() {
             stories = mutableListOf(),
             onClickStory = { story ->
                 val storyJson = storyJsonAdapter.toJson(story)
-                val intent = Intent(this@MainActivity, StoryActivity::class.java).apply {
-                    putExtra(StoryActivity.EXTRA_ITEM_JSON, storyJson)
-                }
+                val intent =
+                    Intent(this@MainActivity, StoryActivity::class.java).apply {
+                        putExtra(StoryActivity.EXTRA_ITEM_JSON, storyJson)
+                    }
                 startActivityForResult(intent)
             },
             onClickMenuItem = { story, menuItemId ->
@@ -95,7 +100,8 @@ class MainActivity : BaseActivity() {
         liveTopStories.observe(this, Observer { resource ->
             when (resource) {
                 is Resource.Loading -> {
-                    if (showProgressView) progressView.visibility = Util.setVisibility(true)
+                    if (showProgressView) progressView.visibility =
+                        Util.setVisibility(true)
                 }
                 is Resource.Success -> {
                     progressView.visibility = View.GONE

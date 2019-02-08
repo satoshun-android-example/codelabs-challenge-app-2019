@@ -1,12 +1,12 @@
-package droidkaigi.github.io.challenge2019
+package droidkaigi.github.io.challenge2019.ui.main
 
 import android.support.v7.widget.PopupMenu
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import droidkaigi.github.io.challenge2019.R
 import droidkaigi.github.io.challenge2019.data.repository.entity.Story
 import droidkaigi.github.io.challenge2019.databinding.ItemStoryBinding
-
 
 class StoryAdapter(
     var stories: MutableList<Story?>,

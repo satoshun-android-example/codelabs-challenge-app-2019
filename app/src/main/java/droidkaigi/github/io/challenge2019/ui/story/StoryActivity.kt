@@ -1,4 +1,4 @@
-package droidkaigi.github.io.challenge2019
+package droidkaigi.github.io.challenge2019.ui.story
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -16,6 +16,9 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ProgressBar
 import com.squareup.moshi.Types
+import droidkaigi.github.io.challenge2019.BaseActivity
+import droidkaigi.github.io.challenge2019.R
+import droidkaigi.github.io.challenge2019.Util
 import droidkaigi.github.io.challenge2019.data.repository.HackerNewsRepository
 import droidkaigi.github.io.challenge2019.data.repository.Resource
 import droidkaigi.github.io.challenge2019.data.repository.entity.Comment
@@ -135,7 +138,7 @@ class StoryActivity : BaseActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return when(item?.itemId) {
+        return when (item?.itemId) {
             R.id.refresh -> {
                 progressView.visibility = Util.setVisibility(true)
                 loadUrlAndComments()
