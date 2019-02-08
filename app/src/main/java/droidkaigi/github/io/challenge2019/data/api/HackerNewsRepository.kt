@@ -4,5 +4,6 @@ class HackerNewsRepository(
     private val api: HackerNewsApi
 ) {
     fun getTopStories() = api.getTopStories()
-    fun getItem(id: Long) = api.getItem(id)
+    fun getComment(id: Long) = api.getItem(id)
+    fun getStory(id: Long) = api.getItem(id)
 }

@@ -1,4 +1,4 @@
-package droidkaigi.github.io.challenge2019
+package droidkaigi.github.io.challenge2019.main
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -15,6 +15,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
 import com.squareup.moshi.Types
+import droidkaigi.github.io.challenge2019.*
 import droidkaigi.github.io.challenge2019.data.api.HackerNewsApi
 import droidkaigi.github.io.challenge2019.data.api.HackerNewsRepository
 import droidkaigi.github.io.challenge2019.data.api.response.Item
@@ -65,9 +66,10 @@ class MainActivity : BaseActivity() {
             stories = mutableListOf(),
             onClickItem = { item ->
                 val itemJson = itemJsonAdapter.toJson(item)
-                val intent = Intent(this@MainActivity, StoryActivity::class.java).apply {
-                    putExtra(StoryActivity.EXTRA_ITEM_JSON, itemJson)
-                }
+                val intent =
+                    Intent(this@MainActivity, StoryActivity::class.java).apply {
+                        putExtra(StoryActivity.EXTRA_ITEM_JSON, itemJson)
+                    }
                 startActivityForResult(intent)
             },
             onClickMenuItem = { item, menuItemId ->
@@ -77,7 +79,7 @@ class MainActivity : BaseActivity() {
                         clipboard.primaryClip = ClipData.newPlainText("url", item.url)
                     }
                     R.id.refresh -> {
-                        repository.getItem(item.id).enqueue(object : Callback<Item> {
+                        repository.getStory(item.id).enqueue(object : Callback<Item> {
                             override fun onResponse(call: Call<Item>, response: Response<Item>) {
                                 response.body()?.let { newItem ->
                                     val index = storyAdapter.stories.indexOf(item)
@@ -137,7 +139,7 @@ class MainActivity : BaseActivity() {
                             val latch = CountDownLatch(ids.size)
 
                             ids.forEach { id ->
-                                repository.getItem(id).enqueue(object : Callback<Item> {
+                                repository.getStory(id).enqueue(object : Callback<Item> {
                                     override fun onResponse(call: Call<Item>, response: Response<Item>) {
                                         response.body()?.let { item -> itemMap[id] = item }
                                         latch.countDown()
